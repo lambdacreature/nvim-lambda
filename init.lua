@@ -12,7 +12,8 @@
 ⠀    ⢠⣿⣿⣿⡿⠀⠀⠀⠀⠀⢿⣿⣿⣷⣤⡄
     ⢀⣾⣿⣿⣿⠁⠀⠀⠀⠀⠀⠈⠿⣿⣿⣿⡇
 
-]]--
+]]
+--
 
 --  NOTE: use the keymap "<space>sh" to [s]earch the [h]elp documentation
 
@@ -23,7 +24,7 @@
 --  NOTE: LSP keymaps
 --          "grn" [R]e[n]ame a variable under your cursor
 
---  NOTE: To install, update and check LSP status, run
+--  NOTE: To install, update and check LSPs, run
 --          :Mason
 
 --  NOTE: To inspect plugin state and pending updates, run
@@ -38,15 +39,12 @@
 --        otherwise run
 --           TODO: add command to update plugins
 
-
-
 -- ============================================================
 -- SECTION 0: QUICK SETTINGS
 -- Values that often get tweaked such as the tab size
 -- ============================================================
 local have_nerd_font = true
 local relative_line_numbers = true
-
 
 -- You can specify filetypes to autoformat on save here:
 local autoformat_enabled_filetypes = {
@@ -56,52 +54,51 @@ local autoformat_enabled_filetypes = {
 
 -- Enable the following language servers
 local enabled_servers = {
-    -- clangd = {},
-    -- gopls = {},
-    pyright = {},
-    tsc = {},
-    --
-    -- Some languages (like rust) have entire language plugins that can be useful:
-    --    https://github.com/mrcjkb/rustaceanvim
-    --
-    -- But for many setups, the LSP (`rust_analyzer`) will work just fine
-    -- rust_analyzer = {},
+  -- clangd = {},
+  -- gopls = {},
+  pyright = {},
+  tsc = {},
+  --
+  -- Some languages (like rust) have entire language plugins that can be useful:
+  --    https://github.com/mrcjkb/rustaceanvim
+  --
+  -- But for many setups, the LSP (`rust_analyzer`) will work just fine
+  -- rust_analyzer = {},
 
-    stylua = {}, -- Used to format Lua code
+  stylua = {}, -- Used to format Lua code
 
-    -- Special Lua Config, as recommended by neovim help docs
-    lua_ls = {
-      on_init = function(client)
-        client.server_capabilities.documentFormattingProvider = false -- Disable formatting (formatting is done by stylua)
+  -- Special Lua Config, as recommended by neovim help docs
+  lua_ls = {
+    on_init = function(client)
+      client.server_capabilities.documentFormattingProvider = false -- Disable formatting (formatting is done by stylua)
 
-        if client.workspace_folders then
-          local path = client.workspace_folders[1].name
-          if path ~= vim.fn.stdpath 'config' and (vim.uv.fs_stat(path .. '/.luarc.json') or vim.uv.fs_stat(path .. '/.luarc.jsonc')) then return end
-        end
+      if client.workspace_folders then
+        local path = client.workspace_folders[1].name
+        if path ~= vim.fn.stdpath 'config' and (vim.uv.fs_stat(path .. '/.luarc.json') or vim.uv.fs_stat(path .. '/.luarc.jsonc')) then return end
+      end
 
-        local current_settings = client.config.settings --[[@as lspconfig.settings.lua_ls]]
-        client.config.settings.Lua = vim.tbl_deep_extend('force', current_settings.Lua, {
-          runtime = {
-            version = 'LuaJIT',
-            path = { 'lua/?.lua', 'lua/?/init.lua' },
-          },
-          workspace = {
-            checkThirdParty = false,
-            -- NOTE: this is a lot slower and will cause issues when working on your own configuration.
-            --  See https://github.com/neovim/nvim-lspconfig/issues/3189
-            library = vim.api.nvim_get_runtime_file('', true),
-          },
-        })
-      end,
-      ---@type lspconfig.settings.lua_ls
-      settings = {
-        Lua = {
-          format = { enable = false }, -- Disable formatting (formatting is done by stylua)
+      local current_settings = client.config.settings --[[@as lspconfig.settings.lua_ls]]
+      client.config.settings.Lua = vim.tbl_deep_extend('force', current_settings.Lua, {
+        runtime = {
+          version = 'LuaJIT',
+          path = { 'lua/?.lua', 'lua/?/init.lua' },
         },
+        workspace = {
+          checkThirdParty = false,
+          -- NOTE: this is a lot slower and will cause issues when working on your own configuration.
+          --  See https://github.com/neovim/nvim-lspconfig/issues/3189
+          library = vim.api.nvim_get_runtime_file('', true),
+        },
+      })
+    end,
+    ---@type lspconfig.settings.lua_ls
+    settings = {
+      Lua = {
+        format = { enable = false }, -- Disable formatting (formatting is done by stylua)
       },
     },
-  }
-
+  },
+}
 
 -- ============================================================
 -- SECTION 1: OPTIONS
