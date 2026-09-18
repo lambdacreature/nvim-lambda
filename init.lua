@@ -1,88 +1,107 @@
 --[[
 
-=====================================================================
-==================== READ THIS BEFORE CONTINUING ====================
-=====================================================================
-========                                    .-----.          ========
-========         .----------------------.   | === |          ========
-========         |.-""""""""""""""""""-.|   |-----|          ========
-========         ||                    ||   | === |          ========
-========         ||   KICKSTART.NVIM   ||   |-----|          ========
-========         ||                    ||   | === |          ========
-========         ||                    ||   |-----|          ========
-========         ||:Tutor              ||   |:::::|          ========
-========         |'-..................-'|   |____o|          ========
-========         `"")----------------(""`   ___________      ========
-========        /::::::::::|  |::::::::::\  \ no mouse \     ========
-========       /:::========|  |==hjkl==:::\  \ required \    ========
-========      '""""""""""""'  '""""""""""""'  '""""""""""'   ========
-========                                                     ========
-=====================================================================
-=====================================================================
+     ⠀⢀⣤⣤⣤⣤⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀    ⢸⣿⣿⣿⣿⣿⣷⡀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀    ⠘⠉⠉⠙⣿⣿⣿⣷⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀    ⢸⣿⣿⣿⣧⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀    ⣼⣿⣿⣿⣿⣆⠀⠀⠀⠀⠀
+⠀⠀⠀⠀    ⠀⣼⣿⣿⣿⣿⣿⣿⡀⠀⠀⠀⠀   Lambda's Neovim Config
+⠀⠀⠀    ⠀⣴⣿⣿⣿⠟⣿⣿⣿⣷⠀⠀⠀⠀
+⠀⠀    ⠀⣰⣿⣿⣿⡏⠀⠸⣿⣿⣿⣇⠀⠀⠀
+⠀    ⠀⢠⣿⣿⣿⡟⠀⠀⠀⢻⣿⣿⣿⡆⠀⠀
+⠀    ⢠⣿⣿⣿⡿⠀⠀⠀⠀⠀⢿⣿⣿⣷⣤⡄
+    ⢀⣾⣿⣿⣿⠁⠀⠀⠀⠀⠀⠈⠿⣿⣿⣿⡇
 
-What is Kickstart?
+]]--
 
-  Kickstart.nvim is *not* a distribution.
+--  NOTE: use the keymap "<space>sh" to [s]earch the [h]elp documentation
 
-  Kickstart.nvim is a starting point for your own configuration.
-    The goal is that you can read every line of code, top-to-bottom, understand
-    what your configuration is doing, and modify it to suit your needs.
+--  NOTE: gitsigns keymaps
+--          "]c" Jump to next git [c]hange
+--          "[c" Jump to previous git [c]hange
 
-    Once you've done that, you can start exploring, configuring and tinkering to
-    make Neovim your own! That might mean leaving Kickstart just the way it is for a while
-    or immediately breaking it into modular pieces. It's up to you!
+--  NOTE: LSP keymaps
+--          "grn" [R]e[n]ame a variable under your cursor
 
-    If you don't know anything about Lua, I recommend taking some time to read through
-    a guide. One possible example which will only take 10-15 minutes:
-      - https://learnxinyminutes.com/docs/lua/
+--  NOTE: To install, update and check LSP status, run
+--          :Mason
 
-    After understanding a bit more about Lua, you can use `:help lua-guide` as a
-    reference for how Neovim integrates Lua.
-    - :help lua-guide
-    - (or HTML version): https://neovim.io/doc/user/lua-guide.html
+--  NOTE: To inspect plugin state and pending updates, run
+--          :lua vim.pack.update(nil, { offline = true })
+--
+--        otherwise run
+--           TODO: add command to inspect plugin state and pending updates
 
-Kickstart Guide:
+--  NOTE: To update plugins, run
+--          :lua vim.pack.update()
+--
+--        otherwise run
+--           TODO: add command to update plugins
 
-  TODO: The very first thing you should do is to run the command `:Tutor` in Neovim.
 
-    If you don't know what this means, type the following:
-      - <escape key>
-      - :
-      - Tutor
-      - <enter key>
 
-    (If you already know the Neovim basics, you can skip this step.)
+-- ============================================================
+-- SECTION 0: QUICK SETTINGS
+-- Values that often get tweaked such as the tab size
+-- ============================================================
+local have_nerd_font = true
+local relative_line_numbers = true
 
-  Once you've completed that, you can continue working through **AND READING** the rest
-  of the kickstart init.lua.
 
-  Next, run AND READ `:help`.
-    This will open up a help window with some basic information
-    about reading, navigating and searching the builtin help documentation.
+-- You can specify filetypes to autoformat on save here:
+local autoformat_enabled_filetypes = {
+  lua = true,
+  python = true,
+}
 
-    This should be the first place you go to look when you're stuck or confused
-    with something. It's one of my favorite Neovim features.
+-- Enable the following language servers
+local enabled_servers = {
+    -- clangd = {},
+    -- gopls = {},
+    pyright = {},
+    tsc = {},
+    --
+    -- Some languages (like rust) have entire language plugins that can be useful:
+    --    https://github.com/mrcjkb/rustaceanvim
+    --
+    -- But for many setups, the LSP (`rust_analyzer`) will work just fine
+    -- rust_analyzer = {},
 
-    MOST IMPORTANTLY, we provide a keymap "<space>sh" to [s]earch the [h]elp documentation,
-    which is very useful when you're not exactly sure of what you're looking for.
+    stylua = {}, -- Used to format Lua code
 
-  I have left several `:help X` comments throughout the init.lua
-    These are hints about where to find more information about the relevant settings,
-    plugins or Neovim features used in Kickstart.
+    -- Special Lua Config, as recommended by neovim help docs
+    lua_ls = {
+      on_init = function(client)
+        client.server_capabilities.documentFormattingProvider = false -- Disable formatting (formatting is done by stylua)
 
-   NOTE: Look for lines like this
+        if client.workspace_folders then
+          local path = client.workspace_folders[1].name
+          if path ~= vim.fn.stdpath 'config' and (vim.uv.fs_stat(path .. '/.luarc.json') or vim.uv.fs_stat(path .. '/.luarc.jsonc')) then return end
+        end
 
-    Throughout the file. These are for you, the reader, to help you understand what is happening.
-    Feel free to delete them once you know what you're doing, but they should serve as a guide
-    for when you are first encountering a few different constructs in your Neovim config.
+        local current_settings = client.config.settings --[[@as lspconfig.settings.lua_ls]]
+        client.config.settings.Lua = vim.tbl_deep_extend('force', current_settings.Lua, {
+          runtime = {
+            version = 'LuaJIT',
+            path = { 'lua/?.lua', 'lua/?/init.lua' },
+          },
+          workspace = {
+            checkThirdParty = false,
+            -- NOTE: this is a lot slower and will cause issues when working on your own configuration.
+            --  See https://github.com/neovim/nvim-lspconfig/issues/3189
+            library = vim.api.nvim_get_runtime_file('', true),
+          },
+        })
+      end,
+      ---@type lspconfig.settings.lua_ls
+      settings = {
+        Lua = {
+          format = { enable = false }, -- Disable formatting (formatting is done by stylua)
+        },
+      },
+    },
+  }
 
-If you experience any errors while trying to install kickstart, run `:checkhealth` for more info.
-
-I hope you enjoy your Neovim journey,
-- TJ
-
-P.S. You can delete this when you're done too. It's your config now! :)
---]]
 
 -- ============================================================
 -- SECTION 1: OPTIONS
@@ -99,7 +118,7 @@ do
   vim.g.maplocalleader = ' '
 
   -- Set to true if you have a Nerd Font installed and selected in the terminal
-  vim.g.have_nerd_font = false
+  vim.g.have_nerd_font = have_nerd_font
 
   -- [[ Setting options ]]
   --  See `:help vim.o`
@@ -108,9 +127,7 @@ do
 
   -- Make line numbers default
   vim.o.number = true
-  -- You can also add relative line numbers, to help with jumping.
-  --  Experiment for yourself to see if you like it!
-  -- vim.o.relativenumber = true
+  vim.o.relativenumber = relative_line_numbers
 
   -- Enable mouse mode, can be useful for resizing splits for example!
   vim.o.mouse = 'a'
@@ -732,52 +749,7 @@ do
   --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
   --  See `:help lsp-config` for information about keys and how to configure
   ---@type table<string, vim.lsp.Config>
-  local servers = {
-    -- clangd = {},
-    -- gopls = {},
-    -- pyright = {},
-    -- tsc = {},
-    --
-    -- Some languages (like rust) have entire language plugins that can be useful:
-    --    https://github.com/mrcjkb/rustaceanvim
-    --
-    -- But for many setups, the LSP (`rust_analyzer`) will work just fine
-    -- rust_analyzer = {},
-
-    stylua = {}, -- Used to format Lua code
-
-    -- Special Lua Config, as recommended by neovim help docs
-    lua_ls = {
-      on_init = function(client)
-        client.server_capabilities.documentFormattingProvider = false -- Disable formatting (formatting is done by stylua)
-
-        if client.workspace_folders then
-          local path = client.workspace_folders[1].name
-          if path ~= vim.fn.stdpath 'config' and (vim.uv.fs_stat(path .. '/.luarc.json') or vim.uv.fs_stat(path .. '/.luarc.jsonc')) then return end
-        end
-
-        local current_settings = client.config.settings --[[@as lspconfig.settings.lua_ls]]
-        client.config.settings.Lua = vim.tbl_deep_extend('force', current_settings.Lua, {
-          runtime = {
-            version = 'LuaJIT',
-            path = { 'lua/?.lua', 'lua/?/init.lua' },
-          },
-          workspace = {
-            checkThirdParty = false,
-            -- NOTE: this is a lot slower and will cause issues when working on your own configuration.
-            --  See https://github.com/neovim/nvim-lspconfig/issues/3189
-            library = vim.api.nvim_get_runtime_file('', true),
-          },
-        })
-      end,
-      ---@type lspconfig.settings.lua_ls
-      settings = {
-        Lua = {
-          format = { enable = false }, -- Disable formatting (formatting is done by stylua)
-        },
-      },
-    },
-  }
+  local servers = enabled_servers
 
   vim.pack.add {
     gh 'neovim/nvim-lspconfig',
@@ -824,11 +796,7 @@ do
   require('conform').setup {
     notify_on_error = false,
     format_on_save = function(bufnr)
-      -- You can specify filetypes to autoformat on save here:
-      local enabled_filetypes = {
-        -- lua = true,
-        -- python = true,
-      }
+      local enabled_filetypes = autoformat_enabled_filetypes
       if enabled_filetypes[vim.bo[bufnr].filetype] then
         return { timeout_ms = 500 }
       else
